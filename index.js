@@ -183,6 +183,143 @@ const updateRole = () => {
     })
 }
 
+const addEmployee = () => {
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'first_name',
+            message: 'What is the first name of the employee?'
+        },
+        {
+            type: 'input',
+            name: 'last_name',
+            message: 'What is the last name of the employee?'
+        },
+        {
+            type: 'list',
+            name: 'role',
+            message: 'What is the role of the employee?',
+            choices: roles
+        },
+        {
+            type: 'list',
+            name: 'manager',
+            message: 'Who is the manager of the employee?',
+            choices: managers
+        }
+    ]).then((answer) => {
+        connection.query('INSERT INTO employee SET ?', answer, (err, res) => {
+            if (err) throw err;
+            console.log('Employee added!');
+            init();
+        })
+    })
+}
+
+const addRole = () => {
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'title',
+            message: 'What is the title of the role?'
+        },
+        {
+            type: 'input',
+            name: 'salary',
+            message: 'What is the salary of the role?'
+        },
+        {
+            type: 'list',
+            name: 'department',
+            message: 'What is the department of the role?',
+            choices: departments
+        }
+    ]).then((answer) => {
+        connection.query('INSERT INTO role SET ?', answer, (err, res) => {
+            if (err) throw err;
+            console.log('Role added!');
+            init();
+        })
+    })
+}
+
+const viewDepartments = () => {
+    connection.query('SELECT * FROM department', (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        init();
+    })
+}
+
+const viewRoles = () => {
+    connection.query('SELECT * FROM role', (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        init();
+    })
+}
+
+const viewEmployees = () => {
+    connection.query('SELECT * FROM employee', (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        init();
+    })
+}
+
+const allManagers = () => {
+    connection.query('SELECT * FROM employee WHERE manager_id IS NULL', (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        init();
+    })
+}
+
+const allEmployees = () => {
+    connection.query('SELECT * FROM employee', (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        init();
+    })
+}
+
+const allRoles = () => {
+    connection.query('SELECT * FROM role', (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        init();
+    })
+}
+
+const allDepartments = () => {
+    connection.query('SELECT * FROM department', (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        init();
+    })
+}
+
+const removeEmployee = () => {
+    inquirer.prompt([
+        {
+            type: 'list',
+            name: 'employee',
+            message: 'Choose the employee?',
+            choices: employees
+        }
+    ]).then((answer) => {
+        connection.query('DELETE FROM employee WHERE id = ?', answer.employee, (err, res) => {
+            if (err) throw err;
+            console.log('Employee removed!');
+            init();
+        })
+    })
+}
+
+
+
+
+
 
 
 

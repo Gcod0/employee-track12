@@ -1,5 +1,7 @@
 const inquirer = require('inquirer');
+const mysql = require('mysq');
 const consoleTable = require('console.table');
+
 
 
 // add department
@@ -71,4 +73,3 @@ const updateEmployeeRole = async () => {
 
         module.exports = request;
 
-        

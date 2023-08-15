@@ -1,5 +1,5 @@
 const inquirer = require('inquirer');
-const mysql = require('mysq');
+const mysql = require('mysql2');
 const consoleTable = require('console.table');
 
 var managers = [];
@@ -7,12 +7,19 @@ var roles = [];
 var employees = [];
 
 const connection = mysql.createConnection({
-    host: 'localhost',
+    host: '127.0.0.1',
     port: 3306,
     user: 'root',
-    password: '',
-    database:'employeeDB'
+    password: 'password',
+    database:'employee_db'
 });
+
+connection.connect((err) => {
+    if (err) throw err;
+    console.log(err)
+    console.log('connected as id ' + connection.threadId);
+    init();
+})
 
 const getManager = () => {
     connection.query('SELECT * FROM employee WHERE manager_id IS NULL', (err, res) => {
@@ -63,10 +70,11 @@ const addDepartment = async () => {
             name: 'department',
             message: 'What is the name of the department?'
         }
-    ])
-    connection.query('INSERT INTO department SET ?', department, (err, res) => {
-        if (err) throw err;
-        console.log('Department added!');
+    ]).then(answer => {
+        connection.query('INSERT INTO department SET ?', {
+            name: answer.department
+        })
+        init()
     })
 }
 
@@ -76,49 +84,49 @@ const init = () => {
     getEmployees();
     getRoles();
     getManager();
+    inquirer.prompt([
+        {name: "init",
+        type: "list",
+        message: "What would you like to do?",
+        choices: [
+            "Add Department",
+            "Add Role",
+            "Add Employee",
+            "View Departments",
+            "View Roles",
+            "View Employees",
+            "Update Employee Role",
+            "Exit"]
+        }
+    ]).then((answer) => {
+        switch (answer.init) {
+            case "Add Department":
+                addDepartment();
+                break;
+            case "Add Role":
+                addRole();
+                break;
+            case "Add Employee":
+                addEmployee();
+                break;
+            case "View Departments":
+                viewDepartments();
+                break;
+            case "View Roles":
+                viewRoles();
+                break;
+            case "View Employees":
+                viewEmployees();
+                break;
+            case "Update Employee Role":
+                updateEmployeeRole();
+                break;
+            case "Exit":
+                connection.end();
+                break;
+        }
+    })
 }
-inquirer.prompt([
-    name: "init",
-    type: "list",
-    message: "What would you like to do?",
-    choices: [
-        "Add Department",
-        "Add Role",
-        "Add Employee",
-        "View Departments",
-        "View Roles",
-        "View Employees",
-        "Update Employee Role",
-        "Exit"
-    ]
-]).then((answer) => {
-    switch (answer.init) {
-        case "Add Department":
-            addDepartment();
-            break;
-        case "Add Role":
-            addRole();
-            break;
-        case "Add Employee":
-            addEmployee();
-            break;
-        case "View Departments":
-            viewDepartments();
-            break;
-        case "View Roles":
-            viewRoles();
-            break;
-        case "View Employees":
-            viewEmployees();
-            break;
-        case "Update Employee Role":
-            updateEmployeeRole();
-            break;
-        case "Exit":
-            connection.end();
-            break;
-    }
-})
 
 const allEmployeeManagers = () => {
     inquirer.prompt([
